@@ -10,6 +10,8 @@ class ScreenManager:
             "StartScreen": screens.StartScreen,
             "AuthWebview": screens.AuthWebviewScreen,
             "SetPin": screens.SetPinScreen,
+            "Forced2Fa": screens.Forced2FaScreen,
+            "MainScreen": screens.MainScreen,
         }
 
     def get_screen(self, screen_name):

@@ -41,3 +41,8 @@ class StartScreen(BaseScreen):
         set_pin_screen = self.context.screen_manager.get_screen("SetPin")
         set_pin_screen.wait_for_screen_loaded()
         set_pin_screen.set_pin(pin_code)
+        forced_2fa_screen = self.context.screen_manager.get_screen("Forced2Fa")
+        forced_2fa_screen.skip()
+        main_screen = self.context.screen_manager.get_screen("MainScreen")
+        main_screen.close_supported_links_popup()
+        main_screen.wait_for_screen_loaded()

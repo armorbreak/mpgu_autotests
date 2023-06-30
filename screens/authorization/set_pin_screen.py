@@ -25,6 +25,7 @@ class SetPinScreen(BaseScreen):
                 self.click_element(pin_digit_button)
                 sleep(0.3)
             if n == 0:
+                self.wait_for_element_disappear("SetPinTitle")
                 self.wait_for_element_is_visible("RepeatPinTitle")
             else:
-                self.wait_for_element_disappear("RepeatPinTitle")
+                self.wait_for_element_disappear("RepeatPinTitle", timeout=60)
