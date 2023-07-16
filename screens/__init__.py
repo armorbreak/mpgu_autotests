@@ -1,4 +1,3 @@
-from screens.base_screen import *
 from screens.authorization.auth_webview_screen import *
 from screens.authorization.onboarding_screen import *
 from screens.authorization.start_screen import *

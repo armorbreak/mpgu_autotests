@@ -1,5 +1,4 @@
-from screens.base_screen import BaseScreen
-from selenium.webdriver.common.by import By
+from framework.base_elements import BaseScreen, Image, Text, Button, FrameLayout
 from creds import contour
 
 
@@ -7,26 +6,30 @@ class StartScreen(BaseScreen):
     def __init__(self, context):
         super().__init__(context)
         self.elements.update({
-            "Logo": "//*[contains(@resource-id, 'flIvAppLogo')]",
-            "LoginButton": "//*[contains(@resource-id, 'flBtnLogin')]",
-            "ContourText": "//*[contains(@resource-id, 'flTvContourText')]",
-            "ChangeContourButton": "//*[contains(@resource-id, 'flIvContourLogo')]",
-            "ContourSelectionBottomSheet": "//*[contains(@resource-id, 'design_bottom_sheet')]"
+            "Logo": Image("Logo", "//*[contains(@resource-id, 'flIvAppLogo')]", self),
+            "LoginButton": Button("LoginButton", "//*[contains(@resource-id, 'flBtnLogin')]", self),
+            "ContourText": Text("ContourText", "//*[contains(@resource-id, 'flTvContourText')]", self),
+            "ChangeContourButton": Button("ChangeContourButton", "//*[contains(@resource-id, 'flIvContourLogo')]", self),
+            "ContourSelectionBottomSheet": FrameLayout("ContourSelectionBottomSheet",
+                                                       "//*[contains(@resource-id, 'design_bottom_sheet')]", self),
         })
         self.required_elements.append(self.elements.get("Logo"))
         self.required_elements.append(self.elements.get("LoginButton"))
 
     def get_contour(self):
-        current_contour = self.context.driver.find_element(By.XPATH, self.elements.get("ContourText")).text
+        current_contour = self.elements.get("ContourText").get_text()
         return current_contour
 
     def select_contour(self, target):
         if self.get_contour().lower() != target.lower():
-            self.click_element("ChangeContourButton")
-            self.wait_for_element_is_visible("ContourSelectionBottomSheet")
-            contour_selector = "//android.widget.TextView[contains(@resource-id, 'bottomSheetCheckableDialogItemTvText')" \
-                               " and translate(@text, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '%s']" % (target.lower())
-            self.click_element(contour_selector)
+            self.elements["ChangeContourButton"].click()
+            self.elements["ContourSelectionBottomSheet"].wait_for_appear()
+            contour_selector = Text("",
+                                    "//android.widget.TextView[contains(@resource-id, 'bottomSheetCheckableDialogItemTvText')" \
+                                    " and translate(@text, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '%s']"
+                                    % (target.lower()),
+                                    self)
+            contour_selector.click()
             self.wait_for_screen_loaded()
 
     def authorize(self, login, password, contour=contour, pin_code=3366):
@@ -34,7 +37,7 @@ class StartScreen(BaseScreen):
         onboarding_screen.skip_tutorial()
         self.wait_for_screen_loaded()
         self.select_contour(contour)
-        self.click_element("LoginButton")
+        self.elements["LoginButton"].click()
         auth_webview = self.context.screen_manager.get_screen("AuthWebview")
         auth_webview.wait_for_screen_loaded()
         auth_webview.login(login, password)

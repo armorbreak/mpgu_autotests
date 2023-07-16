@@ -5,7 +5,6 @@ class ScreenManager:
     def __init__(self, context):
         self.context = context
         self.screens = {
-            "BaseScreen": screens.BaseScreen,
             "Onboarding": screens.OnboardingScreen,
             "StartScreen": screens.StartScreen,
             "AuthWebview": screens.AuthWebviewScreen,

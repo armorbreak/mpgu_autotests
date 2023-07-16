@@ -1,4 +1,4 @@
-from screens.base_screen import BaseScreen
+from framework.base_elements import BaseScreen, Text, Image, Button, ViewGroup
 from time import sleep
 
 
@@ -6,12 +6,15 @@ class SetPinScreen(BaseScreen):
     def __init__(self, context):
         super().__init__(context)
         self.elements.update({
-            "GreetingsText": "//*[contains(@resource-id, 'fpTvGreetings')]",
-            "Avatar": "//*[contains(@resource-id, 'fpIvAvatarLogo')]",
-            "SetPinTitle": "//*[contains(@resource-id, 'fpTvPinTitle') and @text='Придумайте код доступа']",
-            "RepeatPinTitle": "//*[contains(@resource-id, 'fpTvPinTitle') and @text='Повторите код']",
-            "PinInputKeyboard": "//android.view.ViewGroup[contains(@resource-id, 'vpkGlPincodeContainer')]",
-            "LogoutButton": "//android.widget.Button[contains(@resource-id, 'vpkBtnLogout')]",
+            "GreetingsText": Text("GreetingsText", "//*[contains(@resource-id, 'fpTvGreetings')]", self),
+            "Avatar": Image("Avatar", "//*[contains(@resource-id, 'fpIvAvatarLogo')]", self),
+            "SetPinTitle": Text("SetPinTitle",
+                                "//*[contains(@resource-id, 'fpTvPinTitle') and @text='Придумайте код доступа']", self),
+            "RepeatPinTitle": Text("RepeatPinTitle",
+                                   "//*[contains(@resource-id, 'fpTvPinTitle') and @text='Повторите код']", self),
+            "PinInputKeyboard": ViewGroup("PinInputKeyboard",
+                                          "//android.view.ViewGroup[contains(@resource-id, 'vpkGlPincodeContainer')]", self),
+            "LogoutButton": Button("LogoutButton", "//android.widget.Button[contains(@resource-id, 'vpkBtnLogout')]", self),
         })
         self.required_elements.append(self.elements.get("GreetingsText"))
         self.required_elements.append(self.elements.get("Avatar"))
@@ -21,11 +24,13 @@ class SetPinScreen(BaseScreen):
     def set_pin(self, pin):
         for n in range(2):
             for digit in str(pin):
-                pin_digit_button = "//android.widget.Button[contains(@resource-id, 'vpkBtn%s')]" % (str(digit))
-                self.click_element(pin_digit_button)
+                pin_digit_button = Button("",
+                                          "//android.widget.Button[contains(@resource-id, 'vpkBtn%s')]" % (str(digit)),
+                                          self)
+                pin_digit_button.click()
                 sleep(0.3)
             if n == 0:
-                self.wait_for_element_disappear("SetPinTitle")
-                self.wait_for_element_is_visible("RepeatPinTitle")
+                self.elements["SetPinTitle"].wait_for_disappear()
+                self.elements["RepeatPinTitle"].wait_for_appear()
             else:
-                self.wait_for_element_disappear("RepeatPinTitle", timeout=60)
+                self.elements["RepeatPinTitle"].wait_for_disappear(timeout=60)
